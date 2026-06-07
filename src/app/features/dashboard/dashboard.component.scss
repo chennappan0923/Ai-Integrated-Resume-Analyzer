@@ -1,0 +1,210 @@
+.dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 0;
+  color: var(--text-secondary);
+  gap: 16px;
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    border-top-color: var(--color-primary);
+    animation: spin 1s ease-in-out infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.metric-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  background: rgba(18, 20, 29, 0.5);
+
+  .metric-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    span {
+      font-size: 1.8rem;
+    }
+  }
+
+  .cyan-icon { background: rgba(0, 242, 254, 0.1); color: var(--color-primary); }
+  .purple-icon { background: rgba(138, 43, 226, 0.1); color: #b388ff; }
+  .green-icon { background: rgba(0, 230, 118, 0.1); color: var(--color-success); }
+  .amber-icon { background: rgba(255, 179, 0, 0.1); color: var(--color-warning); }
+
+  .metric-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .metric-title {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .metric-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    font-family: var(--font-display);
+  }
+}
+
+.charts-row {
+  display: flex;
+  gap: 24px;
+
+  @media (max-width: 1200px) {
+    flex-direction: column;
+  }
+}
+
+.chart-card {
+  padding: 28px;
+  background: rgba(18, 20, 29, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.main-chart {
+  flex: 2;
+  min-width: 0; // prevent flex blow out
+}
+
+.side-chart {
+  flex: 1;
+  min-width: 0;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  .chart-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+}
+
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend-color {
+    width: 12px;
+    height: 6px;
+    border-radius: 3px;
+  }
+
+  .cyan-legend { background-color: var(--color-primary); }
+  .purple-legend { background-color: var(--color-accent); }
+}
+
+.canvas-container {
+  width: 100%;
+  overflow-x: auto;
+  position: relative;
+  
+  canvas {
+    max-width: 100%;
+    display: block;
+  }
+}
+
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skill-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skill-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.skill-name {
+  color: var(--text-primary);
+}
+
+.skill-count {
+  color: var(--text-secondary);
+}
+
+.skill-bar-container {
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.04);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.skill-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
+}
+
+.empty-text {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 40px 0;
+}

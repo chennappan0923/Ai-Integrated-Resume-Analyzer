@@ -1,0 +1,116 @@
+<div class="profile-wrapper">
+  <div class="profile-grid">
+    <!-- Left Column: Edit Info -->
+    <div class="profile-card glass-panel">
+      <h3 class="card-title">Profile Information</h3>
+      <p class="card-subtitle">Manage your account information and email settings.</p>
+      
+      @if (profileSuccess()) {
+        <div class="banner banner-success">
+          <span class="material-symbols-outlined">check_circle</span>
+          <span>{{ profileSuccess() }}</span>
+        </div>
+      }
+      @if (profileError()) {
+        <div class="banner banner-danger">
+          <span class="material-symbols-outlined">error</span>
+          <span>{{ profileError() }}</span>
+        </div>
+      }
+
+      <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()" class="profile-form">
+        <mat-form-field appearance="fill">
+          <mat-label>Full Name</mat-label>
+          <input matInput type="text" formControlName="fullName" required>
+          @if (profileForm.get('fullName')?.hasError('required') && profileForm.get('fullName')?.touched) {
+            <mat-error>Full name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" formControlName="email" required>
+          @if (profileForm.get('email')?.hasError('required') && profileForm.get('email')?.touched) {
+            <mat-error>Email is required</mat-error>
+          }
+          @if (profileForm.get('email')?.hasError('email') && profileForm.get('email')?.touched) {
+            <mat-error>Enter a valid email address</mat-error>
+          }
+        </mat-form-field>
+
+        <button type="submit" 
+                mat-flat-button 
+                class="gradient-btn submit-btn" 
+                [disabled]="profileForm.invalid || isProfileLoading()">
+          @if (isProfileLoading()) {
+            <span>Saving...</span>
+          } @else {
+            <span>Save Profile</span>
+          }
+        </button>
+      </form>
+    </div>
+
+    <!-- Right Column: Change Password -->
+    <div class="profile-card glass-panel">
+      <h3 class="card-title">Change Password</h3>
+      <p class="card-subtitle">Keep your account secure with a unique password.</p>
+      
+      @if (passwordSuccess()) {
+        <div class="banner banner-success">
+          <span class="material-symbols-outlined">check_circle</span>
+          <span>{{ passwordSuccess() }}</span>
+        </div>
+      }
+      @if (passwordError()) {
+        <div class="banner banner-danger">
+          <span class="material-symbols-outlined">error</span>
+          <span>{{ passwordError() }}</span>
+        </div>
+      }
+
+      <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="profile-form">
+        <mat-form-field appearance="fill">
+          <mat-label>Current Password</mat-label>
+          <input matInput type="password" formControlName="currentPassword" required>
+          @if (passwordForm.get('currentPassword')?.hasError('required') && passwordForm.get('currentPassword')?.touched) {
+            <mat-error>Current password is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>New Password</mat-label>
+          <input matInput type="password" formControlName="newPassword" required>
+          @if (passwordForm.get('newPassword')?.hasError('required') && passwordForm.get('newPassword')?.touched) {
+            <mat-error>New password is required</mat-error>
+          }
+          @if (passwordForm.get('newPassword')?.hasError('minlength') && passwordForm.get('newPassword')?.touched) {
+            <mat-error>Password must be at least 6 characters</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Confirm New Password</mat-label>
+          <input matInput type="password" formControlName="confirmNewPassword" required>
+          @if (passwordForm.get('confirmNewPassword')?.hasError('required') && passwordForm.get('confirmNewPassword')?.touched) {
+            <mat-error>Confirm password is required</mat-error>
+          }
+          @if (passwordForm.hasError('mismatch') && passwordForm.get('confirmNewPassword')?.touched) {
+            <mat-error>New passwords do not match</mat-error>
+          }
+        </mat-form-field>
+
+        <button type="submit" 
+                mat-flat-button 
+                class="gradient-btn submit-btn" 
+                [disabled]="passwordForm.invalid || isPasswordLoading()">
+          @if (isPasswordLoading()) {
+            <span>Updating Password...</span>
+          } @else {
+            <span>Update Password</span>
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

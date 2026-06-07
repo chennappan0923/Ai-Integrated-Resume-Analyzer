@@ -1,0 +1,57 @@
+<div class="history-wrapper">
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading analysis history...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-banner glass-panel">
+      <span class="material-symbols-outlined error-icon">error</span>
+      <span>{{ errorMessage() }}</span>
+      <button mat-button class="retry-btn" (click)="loadHistory()">Retry</button>
+    </div>
+  } @else if (history().length === 0) {
+    <div class="empty-state glass-panel">
+      <span class="material-symbols-outlined empty-icon">history</span>
+      <h3>No analysis history</h3>
+      <p>Analyze your uploaded resumes to populate your analytical progress dashboard history.</p>
+      <button mat-flat-button routerLink="/resumes" class="gradient-btn">View Resumes</button>
+    </div>
+  } @else {
+    <!-- History Cards Grid -->
+    <div class="history-grid">
+      @for (item of history(); track item.id) {
+        <div class="history-card glass-panel glass-panel-hover" [routerLink]="['/analysis', item.resumeId]">
+          <div class="card-left">
+            <span class="material-symbols-outlined history-icon">analytics</span>
+            <div class="history-info">
+              <h3 class="resume-title">{{ item.resumeName }}</h3>
+              <div class="meta-row">
+                <span class="meta-item">
+                  <span class="material-symbols-outlined">calendar_month</span>
+                  {{ item.createdDate | date:'mediumDate' }}
+                </span>
+                <span class="meta-item">
+                  <span class="material-symbols-outlined">person</span>
+                  {{ item.careerLevel }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-right">
+            <div class="score-block">
+              <span class="label">ATS Score</span>
+              <span class="value text-cyan">{{ item.atsScore }}%</span>
+            </div>
+            <div class="score-block">
+              <span class="label">Quality</span>
+              <span class="value text-purple">{{ item.resumeScore }}/100</span>
+            </div>
+            <span class="material-symbols-outlined chevron-icon">chevron_right</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

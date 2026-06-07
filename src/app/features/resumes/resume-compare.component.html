@@ -1,0 +1,205 @@
+<div class="compare-wrapper">
+  <!-- Selector Panels -->
+  <div class="selectors-card glass-panel">
+    <h3 class="panel-title">Select Resumes to Compare</h3>
+    
+    <div class="selectors-grid">
+      <!-- Selector A -->
+      <div class="selector-item">
+        <label>Primary Resume (A)</label>
+        <select [ngModel]="selectedIdA()" (ngModelChange)="selectedIdA.set($event)">
+          <option [value]="null" disabled selected>Select first resume...</option>
+          @for (resume of optionsForA(); track resume.id) {
+            <option [value]="resume.id">{{ resume.resumeName }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- VS Indicator -->
+      <div class="vs-indicator">VS</div>
+
+      <!-- Selector B -->
+      <div class="selector-item">
+        <label>Comparison Resume (B)</label>
+        <select [ngModel]="selectedIdB()" (ngModelChange)="selectedIdB.set($event)">
+          <option [value]="null" disabled selected>Select comparison resume...</option>
+          @for (resume of optionsForB(); track resume.id) {
+            <option [value]="resume.id">{{ resume.resumeName }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  @if (isLoadingComparison()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Comparing analysis models...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-banner glass-panel">
+      <span class="material-symbols-outlined error-icon">error</span>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  } @else if (analysisA() && analysisB()) {
+    <!-- Comparison Dashboard Grid -->
+    <div class="comparison-grid">
+      <!-- Score Metric Comparer Card -->
+      <div class="compare-card glass-panel score-comparison">
+        <h3 class="section-title">Score Metrics Comparison</h3>
+        
+        <div class="score-grid">
+          <!-- Resume A Metrics -->
+          <div class="resume-metric-column">
+            <h4 class="column-name">{{ analysisA()?.resumeName }}</h4>
+            <div class="metric-block">
+              <span class="metric-label">ATS Match</span>
+              <span class="metric-number text-cyan">{{ analysisA()?.atsScore }}%</span>
+            </div>
+            <div class="metric-block">
+              <span class="metric-label">Quality Score</span>
+              <span class="metric-number text-purple">{{ analysisA()?.resumeScore }}/100</span>
+            </div>
+            <div class="metric-block">
+              <span class="metric-label">Level</span>
+              <span class="metric-text">{{ analysisA()?.careerLevel }}</span>
+            </div>
+          </div>
+
+          <!-- Diff Columns -->
+          <div class="comparison-bars">
+            <div class="compare-row">
+              <span class="label">ATS Score Match</span>
+              <div class="bar-comparison-container">
+                <div class="side-bar left" [style.width.%]="analysisA()?.atsScore"></div>
+                <div class="side-bar right" [style.width.%]="analysisB()?.atsScore"></div>
+              </div>
+            </div>
+            <div class="compare-row">
+              <span class="label">Quality Rating</span>
+              <div class="bar-comparison-container">
+                <div class="side-bar left purple" [style.width.%]="analysisA()?.resumeScore"></div>
+                <div class="side-bar right purple" [style.width.%]="analysisB()?.resumeScore"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resume B Metrics -->
+          <div class="resume-metric-column">
+            <h4 class="column-name text-right">{{ analysisB()?.resumeName }}</h4>
+            <div class="metric-block text-right">
+              <span class="metric-label">ATS Match</span>
+              <span class="metric-number text-cyan">{{ analysisB()?.atsScore }}%</span>
+            </div>
+            <div class="metric-block text-right">
+              <span class="metric-label">Quality Score</span>
+              <span class="metric-number text-purple">{{ analysisB()?.resumeScore }}/100</span>
+            </div>
+            <div class="metric-block text-right">
+              <span class="metric-label">Level</span>
+              <span class="metric-text">{{ analysisB()?.careerLevel }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side by side Gaps Comparer Row -->
+      <div class="side-by-side-row">
+        <!-- Panel A -->
+        <div class="comparison-panel glass-panel">
+          <div class="panel-header">
+            <span class="dot-indicator cyan"></span>
+            <h3 class="panel-title">{{ analysisA()?.resumeName }} Details</h3>
+          </div>
+          
+          <div class="panel-section">
+            <h4 class="section-subtitle">Missing Skills Gaps</h4>
+            <div class="skills-tags">
+              @for (skill of analysisA()?.missingSkills; track skill) {
+                <span class="tag tag-danger">
+                  <span class="material-symbols-outlined">warning</span>
+                  {{ skill }}
+                </span>
+              }
+              @if (analysisA()?.missingSkills?.length === 0) {
+                <span class="empty-placeholder">No skill gaps identified.</span>
+              }
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <h4 class="section-subtitle">Identified Tech Skills</h4>
+            <div class="skills-tags">
+              @for (skill of analysisA()?.technicalSkills; track skill) {
+                <span class="tag tag-primary">{{ skill }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <h4 class="section-subtitle">Top Recommendations</h4>
+            <ul class="compare-bullets">
+              @for (sug of analysisA()?.suggestions?.slice(0, 3); track sug) {
+                <li>
+                  <span class="material-symbols-outlined bullet-icon">arrow_forward</span>
+                  <span>{{ sug }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+
+        <!-- Panel B -->
+        <div class="comparison-panel glass-panel">
+          <div class="panel-header">
+            <span class="dot-indicator purple"></span>
+            <h3 class="panel-title">{{ analysisB()?.resumeName }} Details</h3>
+          </div>
+          
+          <div class="panel-section">
+            <h4 class="section-subtitle">Missing Skills Gaps</h4>
+            <div class="skills-tags">
+              @for (skill of analysisB()?.missingSkills; track skill) {
+                <span class="tag tag-danger">
+                  <span class="material-symbols-outlined">warning</span>
+                  {{ skill }}
+                </span>
+              }
+              @if (analysisB()?.missingSkills?.length === 0) {
+                <span class="empty-placeholder">No skill gaps identified.</span>
+              }
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <h4 class="section-subtitle">Identified Tech Skills</h4>
+            <div class="skills-tags">
+              @for (skill of analysisB()?.technicalSkills; track skill) {
+                <span class="tag tag-primary">{{ skill }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <h4 class="section-subtitle">Top Recommendations</h4>
+            <ul class="compare-bullets">
+              @for (sug of analysisB()?.suggestions?.slice(0, 3); track sug) {
+                <li>
+                  <span class="material-symbols-outlined bullet-icon">arrow_forward</span>
+                  <span>{{ sug }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <!-- Empty State -->
+    <div class="compare-empty glass-panel">
+      <span class="material-symbols-outlined empty-icon">compare</span>
+      <h3>Select two analyzed resumes</h3>
+      <p>Select different resumes above to trigger a side-by-side comparison of scores, skill gaps, and recommendations.</p>
+    </div>
+  }
+</div>

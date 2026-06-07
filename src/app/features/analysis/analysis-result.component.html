@@ -1,0 +1,235 @@
+<div class="analysis-wrapper">
+  <!-- Scanning State Layout -->
+  @if (isAnalyzingState()) {
+    <div class="scanner-container glass-panel float-animation">
+      <div class="scanner-header">
+        <div class="scanner-title gradient-text">AI Scanner Active</div>
+        <div class="pulse-indicator"></div>
+      </div>
+
+      <div class="scanner-visual">
+        <div class="document-mock">
+          <div class="mock-line header"></div>
+          <div class="mock-line body-1"></div>
+          <div class="mock-line body-2"></div>
+          <div class="mock-line body-3"></div>
+        </div>
+        <div class="laser-line"></div>
+      </div>
+
+      <div class="mock-terminal">
+        <div class="terminal-header">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="terminal-title">analyzer_logs.sh</span>
+        </div>
+        <div class="terminal-body">
+          @for (step of scanSteps(); track step) {
+            <div class="log-line">
+              <span class="prompt">></span> {{ step }}
+              <span class="status-ok">[OK]</span>
+            </div>
+          }
+          <div class="log-line blinking-cursor">
+            <span class="prompt">></span> <span class="cursor">_</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Error Banner -->
+  @else if (errorMessage() && !analysis()) {
+    <div class="error-banner glass-panel">
+      <span class="material-symbols-outlined error-icon">error</span>
+      <h3>Analysis Unavailable</h3>
+      <p>{{ errorMessage() }}</p>
+      <div class="error-actions">
+        <button mat-flat-button class="gradient-btn" (click)="runAnalysisProcess()">
+          Analyze Resume Now
+        </button>
+        <button mat-button class="back-btn" routerLink="/resumes">Back to Resumes</button>
+      </div>
+    </div>
+  }
+
+  <!-- Analysis Results View -->
+  @else if (analysis()) {
+    <div class="result-container">
+      <!-- Top Profile Overview -->
+      <div class="profile-header-card glass-panel">
+        <div class="profile-meta">
+          <div class="profile-icon">
+            <span class="material-symbols-outlined">account_box</span>
+          </div>
+          <div>
+            <h2 class="resume-name">{{ analysis()?.resumeName }}</h2>
+            <div class="meta-badges">
+              <span class="badge badge-primary">{{ analysis()?.careerLevel }}</span>
+              <span class="meta-date">Analyzed on {{ analysis()?.createdDate | date:'mediumDate' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button mat-flat-button class="gradient-btn action-glow-btn" (click)="generateQuestions()">
+            <span class="material-symbols-outlined">question_answer</span>
+            <span>Generate Interview Questions</span>
+          </button>
+          <button mat-stroked-button class="reanalyze-btn" (click)="runAnalysisProcess()">
+            <span class="material-symbols-outlined">refresh</span>
+            <span>Re-Analyze</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Gauges & Summary metrics row -->
+      <div class="metrics-row">
+        <!-- ATS Score Gauge -->
+        <div class="gauge-card glass-panel">
+          <h3 class="card-section-title">ATS Match Rating</h3>
+          
+          <div class="gauge-visual">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" class="gauge-bg" />
+              <circle cx="60" cy="60" r="50" class="gauge-progress ats" 
+                      [style.strokeDashoffset]="getDashOffset(analysis()?.atsScore || 0)" />
+            </svg>
+            <div class="gauge-text">
+              <span class="value">{{ analysis()?.atsScore }}%</span>
+              <span class="label">ATS Score</span>
+            </div>
+          </div>
+          <p class="gauge-desc">Represents resume optimization for scanner keyword mappings and formatting structures.</p>
+        </div>
+
+        <!-- Resume Quality Gauge -->
+        <div class="gauge-card glass-panel">
+          <h3 class="card-section-title">Resume Score</h3>
+          
+          <div class="gauge-visual">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" class="gauge-bg" />
+              <circle cx="60" cy="60" r="50" class="gauge-progress quality" 
+                      [style.strokeDashoffset]="getDashOffset(analysis()?.resumeScore || 0)" />
+            </svg>
+            <div class="gauge-text">
+              <span class="value">{{ analysis()?.resumeScore }}/100</span>
+              <span class="label">Quality Score</span>
+            </div>
+          </div>
+          <p class="gauge-desc">Evaluates professional language quality, grammar, action verbs, and design layout.</p>
+        </div>
+
+        <!-- Recommended Roles -->
+        <div class="roles-card glass-panel">
+          <h3 class="card-section-title">Suggested Job Roles</h3>
+          <div class="roles-list">
+            @for (role of analysis()?.recommendedRoles; track role) {
+              <div class="role-badge">
+                <span class="material-symbols-outlined">work</span>
+                <span>{{ role }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Strengths & Weaknesses row -->
+      <div class="details-row">
+        <!-- Strengths Card -->
+        <div class="details-card glass-panel strengths">
+          <div class="title-row">
+            <span class="material-symbols-outlined icon green">check_circle</span>
+            <h3 class="card-section-title">Key Strengths</h3>
+          </div>
+          <ul class="bullets-list">
+            @for (strength of analysis()?.strengths; track strength) {
+              <li>
+                <span class="material-symbols-outlined bullet-icon green">check</span>
+                <span>{{ strength }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <!-- Weaknesses Card -->
+        <div class="details-card glass-panel weaknesses">
+          <div class="title-row">
+            <span class="material-symbols-outlined icon red">cancel</span>
+            <h3 class="card-section-title">Areas of Improvement</h3>
+          </div>
+          <ul class="bullets-list">
+            @for (weakness of analysis()?.weaknesses; track weakness) {
+              <li>
+                <span class="material-symbols-outlined bullet-icon red">arrow_forward</span>
+                <span>{{ weakness }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+
+      <!-- Skills gap row -->
+      <div class="skills-row">
+        <!-- Technical & Soft Skills parsed -->
+        <div class="skills-card glass-panel">
+          <h3 class="card-section-title">Identified Skills</h3>
+          
+          <div class="skills-sub-section">
+            <h4 class="skills-sub-title">Technical Skills</h4>
+            <div class="tags-list">
+              @for (skill of analysis()?.technicalSkills; track skill) {
+                <span class="tag tag-tech">{{ skill }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="skills-sub-section">
+            <h4 class="skills-sub-title">Soft Skills</h4>
+            <div class="tags-list">
+              @for (skill of analysis()?.softSkills; track skill) {
+                <span class="tag tag-soft">{{ skill }}</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Missing Skills Gap -->
+        <div class="skills-card glass-panel missing-skills">
+          <h3 class="card-section-title">Missing Skills Gap</h3>
+          <p class="section-desc">Skills identified as highly desirable for recommended job roles, but missing from your resume.</p>
+          <div class="tags-list">
+            @if (analysis()?.missingSkills?.length === 0) {
+              <p class="all-matched-text">
+                <span class="material-symbols-outlined">verified</span>
+                No major skill gaps identified!
+              </p>
+            } @else {
+              @for (skill of analysis()?.missingSkills; track skill) {
+                <span class="tag tag-missing">
+                  <span class="material-symbols-outlined tag-icon">warning</span>
+                  {{ skill }}
+                </span>
+              }
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Improvement Suggestions -->
+      <div class="suggestions-card glass-panel">
+        <h3 class="card-section-title">AI Improvement Action Checklist</h3>
+        <div class="suggestions-grid">
+          @for (sug of analysis()?.suggestions; track sug; let idx = $index) {
+            <div class="suggestion-item">
+              <div class="number-badge">{{ idx + 1 }}</div>
+              <p class="suggestion-text">{{ sug }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

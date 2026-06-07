@@ -1,0 +1,74 @@
+<div class="app-container">
+  <!-- Sidebar for desktop -->
+  <aside class="sidebar glass-panel" [class.open]="isMobileMenuOpen()">
+    <div class="sidebar-brand">
+      <span class="material-symbols-outlined brand-icon">analytics</span>
+      <span class="brand-text gradient-text">ResumeAI</span>
+    </div>
+    
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.label) {
+        <a [routerLink]="item.route" 
+           routerLinkActive="active" 
+           [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
+           (click)="setPageTitle(item.label)" 
+           class="nav-link">
+          <span class="material-symbols-outlined nav-icon">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">
+        <span class="material-symbols-outlined">logout</span>
+        <span class="nav-label">Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Mobile navigation overlay -->
+  @if (isMobileMenuOpen()) {
+    <div class="sidebar-overlay" (click)="toggleMobileMenu()"></div>
+  }
+
+  <!-- Main Content Layout -->
+  <div class="main-layout">
+    <!-- Top Nav Bar -->
+    <header class="topbar glass-panel">
+      <div class="topbar-left">
+        <button class="menu-toggle-btn" (click)="toggleMobileMenu()">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <h1 class="page-title">{{ currentPageTitle() }}</h1>
+      </div>
+
+      <div class="topbar-right">
+        <span class="welcome-text">Hi, {{ authService.currentUser()?.fullName }}</span>
+        
+        <button class="profile-menu-btn" [matMenuTriggerFor]="profileMenu">
+          <div class="avatar">
+            {{ authService.currentUser()?.fullName?.charAt(0)?.toUpperCase() }}
+          </div>
+        </button>
+        
+        <mat-menu #profileMenu="matMenu" xPosition="before">
+          <button mat-menu-item routerLink="/profile" (click)="setPageTitle('Profile')">
+            <span class="material-symbols-outlined">person</span>
+            <span>My Profile</span>
+          </button>
+          <hr class="menu-divider" />
+          <button mat-menu-item (click)="logout()">
+            <span class="material-symbols-outlined">logout</span>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <main class="content-container">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,197 @@
+@use '@angular/material' as mat;
+
+// Define custom color palettes in CSS custom properties for flexible glassmorphic design
+:root {
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  
+  // Custom Dark Theme Palette (Nordic/Cyberpunk blend)
+  --bg-base: #0a0b10;
+  --bg-surface: rgba(18, 20, 29, 0.7);
+  --bg-surface-hover: rgba(26, 29, 41, 0.85);
+  --bg-surface-solid: #12141d;
+  
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-color-hover: rgba(255, 255, 255, 0.15);
+  
+  --color-primary: #00f2fe; // Neon Cyan
+  --color-primary-rgb: 0, 242, 254;
+  --color-accent: #8a2be2; // Neon Purple
+  --color-accent-rgb: 138, 43, 226;
+  --color-success: #00e676; // Emerald Green
+  --color-warning: #ffb300; // Vivid Gold
+  --color-danger: #ff1744; // Bright Red
+  
+  --text-primary: #f5f6fa;
+  --text-secondary: #8f9cae;
+  --text-muted: #5e6b7e;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(0, 242, 254, 0.15);
+  
+  --glass-blur: blur(16px);
+  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+// Global resets
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+// Scrollbars styling
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  transition: var(--transition-smooth);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+// Glassmorphism components utilities
+.glass-panel {
+  background: var(--bg-surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-smooth);
+}
+
+.glass-panel-hover:hover {
+  border-color: var(--border-color-hover);
+  box-shadow: var(--shadow-lg), 0 0 25px rgba(0, 242, 254, 0.08);
+  transform: translateY(-2px);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
+}
+
+.gradient-btn {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent)) !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3) !important;
+  transition: var(--transition-smooth) !important;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4) !important;
+  }
+}
+
+// Custom animations
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.15); }
+  50% { box-shadow: 0 0 25px rgba(0, 242, 254, 0.3); }
+}
+
+.float-animation {
+  animation: float 4s ease-in-out infinite;
+}
+
+// Override Angular Material UI styling for dark-mode harmony
+.mat-mdc-card {
+  background-color: var(--bg-surface-solid) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-md) !important;
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-text-field-wrapper {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border-color) !important;
+  transition: var(--transition-smooth) !important;
+  
+  &:hover {
+    border-color: var(--border-color-hover) !important;
+  }
+  
+  &.mdc-text-field--focused {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+  }
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-line-ripple::after {
+  border-bottom-color: var(--color-primary) !important;
+}
+
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.mat-mdc-button-base {
+  border-radius: 8px !important;
+}
+
+// Custom Material overrides for menus
+.mat-mdc-menu-panel {
+  background-color: var(--bg-surface-solid) !important;
+  border: 1px solid var(--border-color) !important;
+  backdrop-filter: var(--glass-blur);
+  border-radius: 12px !important;
+}
+
+.mat-mdc-menu-item {
+  color: var(--text-primary) !important;
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+}
+
+// Status badges
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+  
+  &.badge-primary { background: rgba(0, 242, 254, 0.15); color: var(--color-primary); border: 1px solid rgba(0, 242, 254, 0.3); }
+  &.badge-accent { background: rgba(138, 43, 226, 0.15); color: #b388ff; border: 1px solid rgba(138, 43, 226, 0.3); }
+  &.badge-success { background: rgba(0, 230, 118, 0.15); color: var(--color-success); border: 1px solid rgba(0, 230, 118, 0.3); }
+  &.badge-warning { background: rgba(255, 179, 0, 0.15); color: var(--color-warning); border: 1px solid rgba(255, 179, 0, 0.3); }
+  &.badge-danger { background: rgba(255, 23, 68, 0.15); color: var(--color-danger); border: 1px solid rgba(255, 23, 68, 0.3); }
+}

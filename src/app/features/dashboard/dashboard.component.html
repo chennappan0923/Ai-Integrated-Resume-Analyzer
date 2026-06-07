@@ -1,0 +1,104 @@
+<div class="dashboard-wrapper">
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Fetching your analytics dashboard...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-banner">
+      <span class="material-symbols-outlined">error</span>
+      <span>{{ errorMessage() }}</span>
+      <button mat-button class="retry-btn" (click)="loadDashboardData()">Retry</button>
+    </div>
+  } @else {
+    <!-- Metrics Grid -->
+    <div class="metrics-grid">
+      <!-- Card 1: Total Resumes -->
+      <div class="metric-card glass-panel glass-panel-hover">
+        <div class="metric-icon cyan-icon">
+          <span class="material-symbols-outlined">description</span>
+        </div>
+        <div class="metric-info">
+          <h3 class="metric-title">Total Resumes</h3>
+          <p class="metric-value">{{ summary()?.totalResumes }}</p>
+        </div>
+      </div>
+
+      <!-- Card 2: Avg ATS Score -->
+      <div class="metric-card glass-panel glass-panel-hover">
+        <div class="metric-icon purple-icon">
+          <span class="material-symbols-outlined">network_check</span>
+        </div>
+        <div class="metric-info">
+          <h3 class="metric-title">Average ATS Score</h3>
+          <p class="metric-value">{{ summary()?.averageAtsScore }}%</p>
+        </div>
+      </div>
+
+      <!-- Card 3: Best Resume Score -->
+      <div class="metric-card glass-panel glass-panel-hover">
+        <div class="metric-icon green-icon">
+          <span class="material-symbols-outlined">emoji_events</span>
+        </div>
+        <div class="metric-info">
+          <h3 class="metric-title">Best Resume Score</h3>
+          <p class="metric-value">{{ summary()?.bestResumeScore }}/100</p>
+        </div>
+      </div>
+
+      <!-- Card 4: Total Analyses -->
+      <div class="metric-card glass-panel glass-panel-hover">
+        <div class="metric-icon amber-icon">
+          <span class="material-symbols-outlined">query_stats</span>
+        </div>
+        <div class="metric-info">
+          <h3 class="metric-title">Total Analyses</h3>
+          <p class="metric-value">{{ summary()?.totalAnalyses }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+      <!-- Left: Score Trend Canvas Chart -->
+      <div class="chart-card glass-panel main-chart">
+        <div class="chart-header">
+          <h3 class="chart-title">Resume Score Trends</h3>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-color cyan-legend"></span>ATS Score</span>
+            <span class="legend-item"><span class="legend-color purple-legend"></span>Resume Quality</span>
+          </div>
+        </div>
+        <div class="canvas-container">
+          <canvas #trendCanvas width="750" height="280"></canvas>
+        </div>
+      </div>
+
+      <!-- Right: Missing Skills aggregate bar list -->
+      <div class="chart-card glass-panel side-chart">
+        <div class="chart-header">
+          <h3 class="chart-title">Top Missing Skills</h3>
+        </div>
+        
+        <div class="skills-list">
+          @if (summary()?.missingSkills?.length === 0) {
+            <p class="empty-text">No missing skills data available. Analyze a resume to parse skill gaps.</p>
+          } @else {
+            @for (item of summary()?.missingSkills; track item.skill) {
+              <div class="skill-item">
+                <div class="skill-labels">
+                  <span class="skill-name">{{ item.skill }}</span>
+                  <span class="skill-count">{{ item.count }} {{ item.count === 1 ? 'resume' : 'resumes' }}</span>
+                </div>
+                <div class="skill-bar-container">
+                  <div class="skill-bar" 
+                       [style.width.%]="(item.count / (summary()?.totalAnalyses || 1)) * 100"></div>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

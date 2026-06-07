@@ -1,0 +1,80 @@
+<div class="auth-wrapper">
+  <div class="glow-bg">
+    <div class="glow-circle cyan-glow"></div>
+    <div class="glow-circle purple-glow"></div>
+  </div>
+
+  <div class="auth-card glass-panel">
+    <div class="auth-header">
+      <span class="material-symbols-outlined brand-icon">analytics</span>
+      <h2 class="brand-name gradient-text">ResumeAI</h2>
+      <p class="auth-subtitle">Create your account to start analyzing resumes</p>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <span class="material-symbols-outlined">error</span>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <mat-form-field appearance="fill">
+        <mat-label>Full Name</mat-label>
+        <input matInput type="text" formControlName="fullName" placeholder="John Doe" required>
+        @if (registerForm.get('fullName')?.hasError('required') && registerForm.get('fullName')?.touched) {
+          <mat-error>Full name is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Email Address</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="name@example.com" required>
+        @if (registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched) {
+          <mat-error>Email is required</mat-error>
+        }
+        @if (registerForm.get('email')?.hasError('email') && registerForm.get('email')?.touched) {
+          <mat-error>Enter a valid email address</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password" required>
+        @if (registerForm.get('password')?.hasError('required') && registerForm.get('password')?.touched) {
+          <mat-error>Password is required</mat-error>
+        }
+        @if (registerForm.get('password')?.hasError('minlength') && registerForm.get('password')?.touched) {
+          <mat-error>Password must be at least 6 characters</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Confirm Password</mat-label>
+        <input matInput type="password" formControlName="confirmPassword" required>
+        @if (registerForm.get('confirmPassword')?.hasError('required') && registerForm.get('confirmPassword')?.touched) {
+          <mat-error>Confirm password is required</mat-error>
+        }
+        @if (registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched) {
+          <mat-error>Passwords do not match</mat-error>
+        }
+      </mat-form-field>
+
+      <button type="submit" 
+              mat-flat-button 
+              class="gradient-btn submit-btn" 
+              [disabled]="registerForm.invalid || isLoading()">
+        @if (isLoading()) {
+          <span>Creating Account...</span>
+        } @else {
+          <span>Sign Up</span>
+        }
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <span>Already have an account? </span>
+      <a routerLink="/auth/login" class="auth-link">Sign In</a>
+    </div>
+  </div>
+</div>

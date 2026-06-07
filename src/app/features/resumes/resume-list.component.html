@@ -1,0 +1,115 @@
+<div class="resume-list-wrapper">
+  <!-- Top Control Bar -->
+  <div class="controls-panel glass-panel">
+    <div class="search-box">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input type="text" 
+             [ngModel]="searchQuery()" 
+             (ngModelChange)="searchQuery.set($event)" 
+             placeholder="Search by resume name...">
+    </div>
+
+    <div class="filters-group">
+      <div class="filter-item">
+        <label>Filter Status</label>
+        <select [ngModel]="filterBy()" (ngModelChange)="filterBy.set($event)">
+          <option value="all">All Resumes</option>
+          <option value="analyzed">Analyzed</option>
+          <option value="pending">Pending Analysis</option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label>Sort By</label>
+        <select [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)">
+          <option value="date_desc">Newest First</option>
+          <option value="date_asc">Oldest First</option>
+          <option value="name_asc">Name (A-Z)</option>
+        </select>
+      </div>
+
+      <button mat-flat-button routerLink="/resumes/upload" class="gradient-btn add-btn">
+        <span class="material-symbols-outlined">add</span>
+        <span>Upload New</span>
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading your resumes...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-banner">
+      <span class="material-symbols-outlined">error</span>
+      <span>{{ errorMessage() }}</span>
+      <button mat-button class="retry-btn" (click)="loadResumes()">Retry</button>
+    </div>
+  } @else if (filteredResumes().length === 0) {
+    <div class="empty-state glass-panel">
+      <span class="material-symbols-outlined empty-icon">folder_open</span>
+      <h3>No resumes found</h3>
+      <p>Get started by uploading your first PDF or DOCX resume.</p>
+      <button mat-flat-button routerLink="/resumes/upload" class="gradient-btn">Upload Resume</button>
+    </div>
+  } @else {
+    <!-- Resumes Grid -->
+    <div class="resumes-grid">
+      @for (resume of filteredResumes(); track resume.id) {
+        <div class="resume-card glass-panel glass-panel-hover">
+          <div class="card-top">
+            <span class="material-symbols-outlined doc-icon" 
+                  [class.pdf-color]="resume.originalFileName.endsWith('.pdf')"
+                  [class.docx-color]="resume.originalFileName.endsWith('.docx')">
+              {{ resume.originalFileName.endsWith('.pdf') ? 'picture_as_pdf' : 'description' }}
+            </span>
+            
+            <div class="badge" [class.badge-success]="resume.hasAnalysis" [class.badge-warning]="!resume.hasAnalysis">
+              {{ resume.hasAnalysis ? 'Analyzed' : 'Pending' }}
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="resume-title" [title]="resume.resumeName">{{ resume.resumeName }}</h3>
+            <span class="file-name" [title]="resume.originalFileName">{{ resume.originalFileName }}</span>
+            
+            <div class="meta-row">
+              <span class="meta-item">
+                <span class="material-symbols-outlined">calendar_month</span>
+                {{ resume.uploadedDate | date:'mediumDate' }}
+              </span>
+              <span class="meta-item">
+                <span class="material-symbols-outlined">database</span>
+                {{ resume.fileSize / 1024 | number:'1.0-0' }} KB
+              </span>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            @if (resume.hasAnalysis) {
+              <button class="action-btn view" (click)="viewResume(resume)" title="View Analysis">
+                <span class="material-symbols-outlined">visibility</span>
+                <span>View</span>
+              </button>
+            } @else {
+              <button class="action-btn analyze" (click)="analyzeResume(resume.id)" title="Run AI Analysis">
+                <span class="material-symbols-outlined">query_stats</span>
+                <span>Analyze</span>
+              </button>
+            }
+            
+            <button class="action-btn download" (click)="downloadResume(resume)" title="Download Original File">
+              <span class="material-symbols-outlined">download</span>
+              <span>Get</span>
+            </button>
+            
+            <button class="action-btn delete" (click)="deleteResume(resume.id)" title="Delete Resume">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

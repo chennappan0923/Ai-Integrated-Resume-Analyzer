@@ -1,0 +1,139 @@
+<div class="interview-wrapper">
+  <!-- Generating State Log Terminal -->
+  @if (isGeneratingState()) {
+    <div class="scanner-container glass-panel float-animation">
+      <div class="scanner-header">
+        <div class="scanner-title gradient-text">Generating Questions</div>
+        <div class="pulse-indicator"></div>
+      </div>
+
+      <div class="scanner-visual">
+        <span class="material-symbols-outlined gen-icon-anim">forum</span>
+      </div>
+
+      <div class="mock-terminal">
+        <div class="terminal-header">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="terminal-title">interview_builder.sh</span>
+        </div>
+        <div class="terminal-body">
+          @for (step of generatorSteps(); track step) {
+            <div class="log-line">
+              <span class="prompt">></span> {{ step }}
+              <span class="status-ok">[OK]</span>
+            </div>
+          }
+          <div class="log-line blinking-cursor">
+            <span class="prompt">></span> <span class="cursor">_</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Error View -->
+  @else if (errorMessage()) {
+    <div class="error-banner glass-panel">
+      <span class="material-symbols-outlined error-icon">error</span>
+      <h3>Failed to Retrieve Questions</h3>
+      <p>{{ errorMessage() }}</p>
+      <div class="error-actions">
+        <button mat-flat-button class="gradient-btn" (click)="runGenerateProcess()">
+          Try Generating Again
+        </button>
+        <button mat-button class="back-btn" [routerLink]="['/analysis', resumeId()]">Back to Analysis</button>
+      </div>
+    </div>
+  }
+
+  <!-- Empty state if no questions exists yet -->
+  @else if (questions().length === 0 && !isLoading()) {
+    <div class="empty-state glass-panel">
+      <span class="material-symbols-outlined empty-icon">forum</span>
+      <h3>No interview questions generated</h3>
+      <p>Generate highly tailored technical, HR, behavioral, and scenario-based interview questions based on your resume analysis.</p>
+      <button mat-flat-button class="gradient-btn" (click)="runGenerateProcess()">
+        Generate Questions
+      </button>
+    </div>
+  }
+
+  <!-- Main View -->
+  @else if (questions().length > 0) {
+    <div class="questions-container">
+      <!-- Filter Toolbar -->
+      <div class="toolbar-panel glass-panel">
+        <div class="category-filters">
+          @for (cat of categories; track cat) {
+            <button class="filter-btn" 
+                    [class.active]="selectedCategory() === cat" 
+                    (click)="setCategory(cat)">
+              {{ cat }}
+            </button>
+          }
+        </div>
+
+        <div class="toolbar-actions">
+          <button mat-flat-button class="gradient-btn download-btn" (click)="downloadQuestions()">
+            <span class="material-symbols-outlined">download</span>
+            <span>Download PDF/Text</span>
+          </button>
+          <button mat-stroked-button class="regenerate-btn" (click)="runGenerateProcess()">
+            <span class="material-symbols-outlined">refresh</span>
+            <span>Regenerate</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Questions List -->
+      <div class="questions-list">
+        @if (filteredQuestions().length === 0) {
+          <p class="empty-text">No questions found matching the selected category.</p>
+        } @else {
+          @for (q of filteredQuestions(); track q.id; let idx = $index) {
+            <div class="question-card glass-panel glass-panel-hover" 
+                 [class.expanded]="activeQuestionId() === q.id"
+                 (click)="toggleAccordion(q.id)">
+              
+              <div class="question-header">
+                <div class="question-title-group">
+                  <span class="q-number">{{ idx + 1 }}</span>
+                  <div class="badge-row">
+                    <span class="badge" 
+                          [class.badge-primary]="q.category === 'Technical'"
+                          [class.badge-accent]="q.category === 'Behavioral'"
+                          [class.badge-success]="q.category === 'HR'"
+                          [class.badge-warning]="q.category === 'Scenario'">
+                      {{ q.category }}
+                    </span>
+                  </div>
+                  <h4 class="question-text">{{ q.question }}</h4>
+                </div>
+                
+                <span class="material-symbols-outlined expand-icon">
+                  {{ activeQuestionId() === q.id ? 'expand_less' : 'expand_more' }}
+                </span>
+              </div>
+
+              <!-- Accordion Expandable Answer Hint -->
+              @if (activeQuestionId() === q.id) {
+                <div class="question-body" (click)="$event.stopPropagation()">
+                  <div class="hint-title">
+                    <span class="material-symbols-outlined">lightbulb</span>
+                    <span>AI Interview Preparation Guide</span>
+                  </div>
+                  <div class="hint-content">
+                    <p><strong>What the interviewer is looking for:</strong> Focus on demonstrating practical experience. Avoid dry theories; instead, describe an actual scenario, project, or instance where this occurred.</p>
+                    <p><strong>Recommended Strategy (STAR Method):</strong> Define the <strong>S</strong>ituation, specify the <strong>T</strong>ask, outline the <strong>A</strong>ctions you undertook, and highlight the measurable <strong>R</strong>esults achieved.</p>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+</div>
