@@ -28,8 +28,8 @@ export class LoginComponent {
   private route = inject(ActivatedRoute);
 
   loginForm: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
+    email: ['admin@example.com', [Validators.required, Validators.email]],
+    password: ['Admin123!', [Validators.required, Validators.minLength(6)]]
   });
 
   isLoading = signal(false);
